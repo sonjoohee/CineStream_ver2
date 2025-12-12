@@ -1,6 +1,3 @@
-
-
-````markdown
 # 🎬 CineStream (OTT Platform TypeScript Migration)
 
 > **Project Status:** Refactoring (JavaScript → TypeScript)  
@@ -38,7 +35,6 @@ export interface Movie {
   release_date: string;
   vote_average: number;
 }
-````
 
 ### 2\. 컴포넌트 재사용성 및 유지보수성 향상
 
