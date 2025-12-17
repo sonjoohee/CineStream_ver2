@@ -6,12 +6,10 @@ import axios from '../../api/axios';
 
 interface Movie {
   backdrop_path: string;
-  // 다른 필요한 속성들을 여기에 추가할 수 있습니다.
 }
 
 const DetailPage = () => {
     let {movieId} = useParams<{movieId: string}>();
-    //let movieId = useParams().movieId;와 같은 것
     const [movie, setMovie] = useState<Movie | null>(null);
 
     useEffect(() => {

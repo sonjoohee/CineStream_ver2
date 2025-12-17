@@ -8,7 +8,6 @@ interface Movie {
   id: number;
   backdrop_path: string | null;
   media_type: string;
-  // 다른 필요한 속성들을 여기에 추가할 수 있습니다.
 }
 
 const SearchPage = () => {
@@ -17,8 +16,8 @@ const SearchPage = () => {
     const navigate = useNavigate();
 
     const useQuery = () => {
-        return new URLSearchParams(useLocation().search); //현재 경로의 쿼리 문자열 
-      } //url ?뒤의 파라미터들을 가져옴 
+        return new URLSearchParams(useLocation().search); 
+      } 
     
       let query = useQuery();
       const searchTerm = query.get("q") 
@@ -27,7 +26,7 @@ const SearchPage = () => {
 
 
     useEffect(() => {
-        if(debouncedSearchTerm){  //만약 searchTerm이 존재한다면 
+        if(debouncedSearchTerm){  
             fetchSearchMovie(debouncedSearchTerm)
         }
     

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate} from 'react-router-dom';
 import app from "../firebase";
-import { getAuth, GoogleAuthProvider,onAuthStateChanged,signInWithPopup, signOut } from 'firebase/auth';
-//onAuthStateChanged: 로그인 되어 있는지 안되어 있는지 체크 해주는거 
+import { getAuth, GoogleAuthProvider,onAuthStateChanged,signInWithPopup, signOut } from 'firebase/auth'; 
 
 interface UserData {
   photoURL?: string;
@@ -14,7 +13,7 @@ interface NavWrapperProps {
   show: boolean;
 }
 
-//모든 컴포넌트에서 nav.js를 사용하고 있음 
+
 const Nav = () => {
   const initialUserDataString = localStorage.getItem("userData");
   let initialUserData = {};
@@ -38,11 +37,11 @@ const Nav = () => {
   
   useEffect(() => {
 
-    //로그인 페이지에서만 해당될수 있게 조건 추가 : 안 추가하면 search등 다른 페이지를 넘어가려고 햇도  메인 페이지가 나옴 
+    
 
     onAuthStateChanged(auth, (user) => {
         if(user){
-            if(pathname === "/"){  //pathname이 로그인 페이지 일때만 
+            if(pathname === "/"){  
             navigate("/main");
             }
         }else {
@@ -51,9 +50,7 @@ const Nav = () => {
         })
 
   }, [auth,navigate,pathname])
-  //"/" 로그인 페이지로 갈 수 있도록
-  //"/main" 메인 페이지로 갈 수 있도록 
-  
+
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -62,7 +59,7 @@ const Nav = () => {
       window.removeEventListener("scroll",handleScroll);
     };
   }, []);
-  //[]안에 있으면 그게 변할 때 마다 실행되고 아니면 빈배열이면 컴포넌트가 딱 한번 실행
+ 
 
   const handleSignOut = () => {
     signOut(auth)
@@ -104,7 +101,10 @@ const Nav = () => {
   }
 
   const handleAuth = () => {
-    signInWithPopup(auth,provider)
+  provider.setCustomParameters({
+    prompt: 'select_account'
+  });
+  signInWithPopup(auth, provider)
     .then(result => {
         setuserData(result.user as UserData);
         localStorage.setItem("userData", JSON.stringify(result.user));
@@ -112,7 +112,6 @@ const Nav = () => {
     .catch(error => {
         console.log(error);
     })
-
 }
 
   return (

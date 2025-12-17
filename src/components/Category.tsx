@@ -54,7 +54,7 @@ const Container = styled.div`
     grid-template-columns: repeat(1, 1fr);
   }
 `;
-//미디어가 768보다 작을때는 하나만 나타나게 아니면 5개 모두 나타남
+
 
 const Wrap = styled.div`
   padding-top: 56.25%;
