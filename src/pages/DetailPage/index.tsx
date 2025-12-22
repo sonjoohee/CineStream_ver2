@@ -1,11 +1,15 @@
-//index.js라고 하면 다른 파일에서 import하면 default 파일이기 때ans에 이름 안넣어줘도 됨.
-//즉 다른 파일에서 import componentname from './Detailpage'이런식으로 폴더 이름만 써도 됨
-import React, { useState, useEffect } from 'react'
+import  { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from '../../api/axios';
 
 interface Movie {
   backdrop_path: string;
+  id?: number;
+  title?: string;
+  name?: string;
+  overview?: string;
+  release_date?: string;
+  vote_average?: number;
 }
 
 const DetailPage = () => {
@@ -17,7 +21,7 @@ const DetailPage = () => {
             const response = await axios.get(
                 `/movie/${movieId}`
             )
-            setMovie(response.data);
+            setMovie(response.data as Movie);
         }
         fetchData();
 

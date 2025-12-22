@@ -8,6 +8,10 @@ interface Movie {
   backdrop_path: string;
   name?: string;
   title?: string;
+  overview?: string;
+  release_date?: string;
+  vote_average?: number;
+  first_air_date?: string;
 }
 
 interface RowProps {
@@ -19,10 +23,8 @@ interface RowProps {
 const Row = ({ title, id, fetchUrl }: RowProps) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [movieSelected, setMovieSelection] = useState<any>({});
+  const [movieSelected, setMovieSelection] = useState<Movie>({} as Movie);
 
-
- 
   const fetchMovieData = useCallback(async () => {
     const response = await axios.get(fetchUrl);
     setMovies(response.data.results);
@@ -35,7 +37,6 @@ const Row = ({ title, id, fetchUrl }: RowProps) => {
   const handleClick = (movie: Movie) => {
     setModalOpen(true);
     setMovieSelection(movie);
-
   }
 
   const handleScrollLeft = () => {
@@ -95,5 +96,4 @@ const Row = ({ title, id, fetchUrl }: RowProps) => {
   )
 }
 
-export default Row; 
-
+export default Row;
