@@ -1,13 +1,13 @@
 # 🎬 CineStream (OTT Platform TypeScript Migration)
 
-> **Project Status:** Refactoring (JavaScript → TypeScript)  
-> **Role:** Frontend Developer (100% Contribution)  
+> **Project Status:** 리팩토링(Refactoring) (JavaScript → TypeScript)  
+> **Role:** 프론트엔드
 > **Tech Stack:** React, TypeScript, Firebase, Styled-Components, TMDB API
 
 <br/>
 
 ## 📖 Project Overview
-기존 JavaScript(React)로 개발된 영화 스트리밍 서비스를 **TypeScript**로 마이그레이션하여, **타입 안정성(Type Safety)** 확보 및 **개발 생산성(DX)**을 개선한 개인 리팩토링 프로젝트입니다. 단순한 기능 구현을 넘어, 견고한 애플리케이션 아키텍처를 구축하는 데 집중했습니다.
+기존 JavaScript(React)로 개발된 영화 스트리밍 서비스를 **TypeScript**로 마이그레이션하여, **타입 안정성(Type Safety)** 확보 및 개발 생산성을 개선한 개인 리팩토링 프로젝트입니다. 단순한 기능 구현을 넘어, 견고한 애플리케이션 아키텍처를 구축하는 데 집중했습니다.
 
 <br/>
 
@@ -36,7 +36,7 @@ export interface Movie {
   vote_average: number;
 }
 
-### 2\. 컴포넌트 재사용성 및 유지보수성 향상
+### 2. 컴포넌트 재사용성 및 유지보수성 향상
 
 **✅ Component Props Validation**
 각 컴포넌트가 받아야 할 필수/선택 값을 명시하여, 잘못된 데이터 전달로 인한 런타임 에러(Undefined Error)를 방지했습니다. 또한, IDE의 자동 완성(IntelliSense) 지원을 통해 개발 생산성을 높였습니다.
@@ -88,12 +88,7 @@ const useDebounce = <T>(value: T, delay: number): T => {
 
 ## 🔥 Migration Challenges & Solutions (Trouble Shooting)
 
-**Challenge 1: 외부 라이브러리 타입 호환성 문제**
-
-  * **문제:** 초기 마이그레이션 시 `Swiper` 등 일부 외부 라이브러리의 타입 정의가 누락되거나 버전이 맞지 않아 컴파일 에러 발생.
-  * **해결:** 공식 문서를 참고하여 `@types` 패키지를 설치하거나, 필요한 경우 `d.ts` 선언 파일을 직접 작성하여 타입을 커스텀 정의함.
-
-**Challenge 2: 복잡한 객체 구조와 'any'의 유혹**
+**Challenge: 복잡한 객체 구조와 'any'의 유혹**
 
   * **문제:** API 응답값이 중첩된 객체 배열 형태일 때, 타입을 일일이 정의하기 번거로워 `any`를 사용하고 싶은 문제가 있었음.
   * **해결:** `any` 사용을 지양하기 위해 Interface를 공통 모듈로 분리하고, TypeScript의 `Utility Types (Pick, Omit, Partial)`를 적극 활용하여 중복 없는 효율적인 타입 설계를 진행함.
