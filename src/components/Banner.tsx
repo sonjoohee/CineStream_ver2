@@ -67,8 +67,7 @@ const Banner = () => {
       </>
     );
   }
-
-  // 데이터가 로딩되지 않았을 때의 처리가 필요하다면 여기에 추가
+  
   if (!movie) return null;
 
   return (

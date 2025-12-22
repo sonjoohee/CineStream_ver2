@@ -1,4 +1,3 @@
-import React from 'react'
 import requests from "../../api/request";
 import Nav from "../../components/Nav";
 import styled from "styled-components";

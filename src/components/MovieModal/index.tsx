@@ -25,7 +25,6 @@ const MovieModal = ({
 }: MovieModalProps) => {
 
   const ref =  useRef<HTMLDivElement>(null!);
-  //console.log('ref',ref.current);
   
   useOnClickOutside(ref, () => {
     setModalOpen(false);

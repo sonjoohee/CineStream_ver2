@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 
 const Category = () => {
@@ -101,5 +100,3 @@ const Wrap = styled.div`
 
   }
 `;
-//inset: top,right,bottom,left 한번에 적을 수 있는 것
-//hover전에 video의 opacity를 0으로 해서 안보이게 hover하면 보이도록 1로 설정
