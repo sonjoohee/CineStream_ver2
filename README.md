@@ -1,123 +1,192 @@
-# 🎬 CineStream (OTT Platform TypeScript Migration)
+# 🎬 CineStream - Next.js App Router Migration Portfolio
 
-> **Project Status:** 리팩토링(Refactoring) (JavaScript → TypeScript)  
-> **Role:** 프론트엔드
-> **Tech Stack:** React, TypeScript, Firebase, Styled-Components, TMDB API
-
-<br/>
-
-## 📖 Project Overview
-기존 JavaScript(React)로 개발된 영화 스트리밍 서비스를 **TypeScript**로 마이그레이션하여, **타입 안정성(Type Safety)** 확보 및 개발 생산성을 개선한 개인 리팩토링 프로젝트입니다. 단순한 기능 구현을 넘어, 견고한 애플리케이션 아키텍처를 구축하는 데 집중했습니다.
+> **프로젝트 상태:** 완료 (포트폴리오 목적)  
+> **역할:** 프론트엔드 개발  
+> **기술 스택:** Next.js App Router, TypeScript, React, Firebase, Styled-Components, TMDB API
 
 <br/>
 
-## 🎯 Project Goal: Why TypeScript?
+## 📖 프로젝트 개요
 
-단순히 언어를 변환하는 것을 넘어, 정적 타이핑이 제공하는 이점을 활용하여 **"런타임 에러 없는 안정적인 애플리케이션"**을 구축하고자 했습니다.
-특히 **API 데이터 처리, Firebase 인증, 컴포넌트 상태 관리** 등 핵심 기능에 TypeScript를 도입하여 코드의 신뢰성을 높였습니다.
+CineStream은 기존 JavaScript(Create React App) 기반 영화 스트리밍 서비스를 **TypeScript 마이그레이션 → Next.js App Router 마이그레이션**으로 이어지는 점진적인 아키텍처 개선을 담은 포트폴리오 프로젝트입니다. 단순한 기능 구현을 넘어, 견고한 애플리케이션 아키텍처 구축과 현대적인 웹 개발 패턴 적용에 집중했습니다.
+
+### 핵심 특징
+- **서버 사이드 렌더링**: Next.js App Router를 통한 SEO 최적화 및 초기 로딩 성능 개선
+- **정적 타이핑**: TypeScript를 통한 런타임 오류 방지 및 코드 유지보수성 향상
+- **동적 라우팅**: 영화 ID별 상세 페이지 구현 (`/movie/[id]`)
+- **Firebase 인증**: 구글 OAuth 기반 사용자 인증 시스템
+- **TMDB API 연동**: 실시간 영화 데이터 조회 및 검색 기능
 
 <br/>
 
-## 🚀 Key Improvements & Technical Decisions
+## 🚀 주요 개선 사항 & 기술적 결정
 
-### 1. 타입 안정성 (Type Safety) 확보
-**✅ API 응답 데이터의 명확한 정의 (Interface)**
-영화 API(TMDB)로부터 받아오는 데이터 구조를 `interface`로 명확히 정의했습니다. 이를 통해 `title`, `poster_path` 등 데이터 필드 접근 시 발생할 수 있는 **오타나 잘못된 속성 참조를 컴파일 단계에서 차단**했습니다.
+### 1. 타입 안전성(Type Safety) 확보
+
+**문제:** JavaScript 기반의 기존 코드에서는 런타임 시 발생하는 오타, undefined 속성 접근, API 응답 구조 불일치 등의 문제 발생
+
+**해결:** TypeScript 마이그레이션을 통해 모든 API 응답 구조를 명확히 정의
 
 ```typescript
-// Example: Movie Data Interface definition
+// 영화 데이터 인터페이스 정의
 export interface Movie {
   id: number;
-  title: string;
-  overview: string;
-  poster_path: string;
   backdrop_path: string;
-  release_date: string;
-  vote_average: number;
+  title?: string;
+  name?: string;
+  overview?: string;
+  release_date?: string;
+  vote_average?: number;
+  first_air_date?: string;
+  poster_path?: string;
+  media_type?: string;
 }
-
-### 2. 컴포넌트 재사용성 및 유지보수성 향상
-
-**✅ Component Props Validation**
-각 컴포넌트가 받아야 할 필수/선택 값을 명시하여, 잘못된 데이터 전달로 인한 런타임 에러(Undefined Error)를 방지했습니다. 또한, IDE의 자동 완성(IntelliSense) 지원을 통해 개발 생산성을 높였습니다.
-
-```typescript
-// Example: Reusable Button Component Interface
-interface ButtonProps {
-  label: string;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary'; // 리터럴 타입으로 옵션 제한
-  disabled?: boolean; // 선택적 속성 (Optional)
-}
-
-const Button: React.FC<ButtonProps> = ({ label, onClick, variant = 'primary', disabled }) => {
-  return (
-    <StyledButton onClick={onClick} disabled={disabled} variant={variant}>
-      {label}
-    </StyledButton>
-  );
-};
 ```
 
-### 3\. 이벤트 핸들러 및 Hooks 타입 구체화
+**효과:** 
+- 컴파일 시점에서 타입 오류 감지
+- IDE 자동완성 및 코드 리팩토링 지원 강화
+- API 응답 구조 변경 시 영향 범위 파악 용이
 
-**✅ Strict Event Typing**
-`any` 타입 사용을 지양하고, React 이벤트와 Hooks에 정확한 제네릭(Generic) 타입을 적용했습니다.
-예를 들어, 검색어 입력 핸들러에서 `ChangeEvent<HTMLInputElement>` 타입을 지정하여 이벤트 객체의 속성에 안전하게 접근하도록 구현했습니다.
+### 2. Next.js App Router 아키텍처 설계
+
+**문제:** SPA 기반 CRA 아키텍처로 인한 SEO 및 초기 로딩 성능 제약
+
+**해결:** 서버 컴포넌트와 클라이언트 컴포넌트 분리를 통한 최적의 렌더링 전략 설계
 
 ```typescript
-// Example: Search Input Event Handling
-const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setSearchTerm(e.target.value); // 문자열 타입 보장
-};
-
-// Example: Custom Hook with Generics
-const useDebounce = <T>(value: T, delay: number): T => {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+// 서버 컴포넌트: 데이터 fetch 및 메타데이터 생성
+export default async function DetailPage({ params }: DetailPageProps) {
+  const { id: movieId } = params;
   
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
+  let movie: Movie | null = null;
+  const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=...`);
+  
+  if (response.ok) {
+    movie = (await response.json()) as Movie;
+  }
 
-  return debouncedValue;
-};
+  return <MovieDetailClient movie={movie} />;
+}
+
+// 클라이언트 컴포넌트: 인터랙티브 UI 처리
+'use client';
+export default function MovieDetailClient({ movie }: MovieDetailClientProps) {
+  // 클라이언트 사이드 상태 관리 및 이벤트 처리
+}
 ```
 
-<br>
+**효과:**
+- 데이터 fetching을 서버에서 처리하여 TTFB(Time to First Byte) 개선
+- 인터랙티브 UI 요소만 클라이언트 번들에 포함
+- SEO를 위한 동적 메타데이터 생성 가능
 
-## 🔥 Migration Challenges & Solutions (Trouble Shooting)
+### 3. 서버/클라이언트 컴포넌트 경계 분리
 
-**Challenge: 복잡한 객체 구조와 'any'의 유혹**
+**문제:** 서버 사이드 렌더링 환경에서 `localStorage`, `window` 객체 접근으로 인한 에러 발생
 
-  * **문제:** API 응답값이 중첩된 객체 배열 형태일 때, 타입을 일일이 정의하기 번거로워 `any`를 사용하고 싶은 문제가 있었음.
-  * **해결:** `any` 사용을 지양하기 위해 Interface를 공통 모듈로 분리하고, TypeScript의 `Utility Types (Pick, Omit, Partial)`를 적극 활용하여 중복 없는 효율적인 타입 설계를 진행함.
+**해결:** `localStorage` 접근을 `useEffect` 내부로 이동시켜 클라이언트 사이드 실행 보장
 
-<br>
+```typescript
+// ❌ 서버 사이드에서 실행되어 에러 발생
+const initialUserDataString = localStorage.getItem("userData");
 
-## ✨ Key Results
-
-  * **Bug Reduction:** 컴파일 단계에서 잠재적 버그(오타, 속성 누락 등) 약 **80% 사전 차단**.
-  * **Code Quality:** 명시적인 타입 정의가 곧 문서 역할을 수행하여, 별도의 주석 없이도 **코드 가독성 향상**.
-  * **Performance:** 불필요한 렌더링을 유발하는 코드를 식별하고 `useMemo`, `useCallback`을 적절히 적용하여 최적화.
-
-<br>
-
-## 🛠 Installation & Setup
-
-```bash
-# 1. Clone the repository
-git clone [https://github.com/your-username/movie-app-v2.git](https://github.com/your-username/movie-app-v2.git)
-
-# 2. Install dependencies
-npm install
-
-# 3. Environment Setup (.env)
-REACT_APP_API_KEY=your_api_key_here
-
-# 4. Run the project
-npm start
+// ✅ 클라이언트 사이드에서만 실행되도록 수정
+useEffect(() => {
+  const initialUserDataString = localStorage.getItem("userData");
+  if (initialUserDataString) {
+    try {
+      const parsedData = JSON.parse(initialUserDataString);
+      setInitialUserData(parsedData);
+    } catch (error) {
+      console.error("Error parsing user data from localStorage", error);
+    }
+  }
+}, []);
 ```
 
-```
-```
+**효과:**
+- 서버 사이드 렌더링 시 브라우저 API 관련 에러 해결
+- 올바른 하이드레이션(Hydration) 처리
+
+<br/>
+
+## 🔧 기술 스택
+
+| 영역 | 기술 |
+|------|------|
+| **프레임워크** | Next.js 14 (App Router), React 18 |
+| **타입 시스템** | TypeScript 5.9.3 |
+| **스타일링** | Styled Components 6.1.8 |
+| **상태 관리** | React 내장 Hooks (useState, useEffect, useContext) |
+| **인증** | Firebase SDK v10.7.1 |
+| **API 연동** | TMDB REST API (axios 기반 wrapper) |
+| **빌드 도구** | Next.js App Router (React Server Components) |
+
+<br/>
+
+## 🏗️ 아키텍처 개선 여정
+
+### 1단계: JavaScript CRA → TypeScript 마이그레이션
+- 모든 컴포넌트에 타입 정의 적용
+- API 응답 구조를 명확히 정의하여 런타임 오류 방지
+- `interface` 기반의 엄격한 타입 체크 구조 구축
+
+### 2단계: TypeScript CRA → Next.js App Router 마이그레이션
+- 서버 컴포넌트와 클라이언트 컴포넌트 분리 구조 설계
+- 동적 라우팅 (`/movie/[id]`, `/search`) 구현
+- SEO 최적화를 위한 동적 메타데이터 생성
+- 레거시 CRA 코드는 `legacy-cra/` 디렉토리에 보관
+
+### 3단계: 포트폴리오 품질 향상
+- 모듈 간 의존성 분리 및 재사용 가능한 컴포넌트 설계
+- 환경 변수 관리 개선 (Firebase API 키, TMDB API 키)
+- 오류 처리 및 예외 케이스 대응 로직 구현
+
+<br/>
+
+## 💡 해결한 주요 문제
+
+### 1. 모듈 해결(Module Resolution) 오류
+- **문제:** Next.js App Router의 `[id]` 동적 라우트 폴더 구조에서 모듈 임포트 오류 발생
+- **해결:** 서버/클라이언트 컴포넌트 분리 구조를 통한 올바른 import/export 패턴 설계
+
+### 2. 서버 사이드 렌더링 브라우저 API 접근 문제
+- **문제:** `localStorage`, `window` 객체를 서버 사이드에서 접근하면서 발생하는 오류
+- **해결:** 브라우저 API 접근을 `useEffect` 내부로 이동하여 클라이언트 사이드 실행 보장
+
+### 3. Next.js 라우팅 시스템과의 호환성 문제
+- **문제:** 기존 CRA의 `react-router-dom`과 Next.js App Router 간 충돌
+- **해결:** 레거시 코드는 별도 디렉토리에 보관, 새로운 Next.js 라우팅 시스템 적용
+
+<br/>
+
+## 🎯 포트폴리오로서의 가치
+
+### 1. 아키텍처 설계 능력
+- 기존 아키텍처의 한계를 식별하고 적절한 마이그레이션 전략 수립
+- 서버/클라이언트 컴포넌트 분리 개념 이해 및 실제 적용
+
+### 2. 기술 스택 마스터리
+- TypeScript의 정적 타이핑 철학을 실제 프로젝트에 적용
+- Next.js App Router의 SSR/SSG 기능을 활용한 성능 최적화
+
+### 3. 문제 해결 능력
+- 마이그레이션 과정에서 발생한 다양한 기술적 문제 해결 경험
+- 런타임 오류, 모듈 해결 오류, 브라우저 API 접근 문제 등 다차원적 문제 해결
+
+### 4. 유지보수성 고려
+- 레거시 코드 보존을 통한 마이그레이션 여정 문서화
+- 명확한 컴포넌트 책임 분리 및 타입 정의
+
+<br/>
+
+
+<br/>
+
+## 📊 기술적 성과
+
+- **타입 안전성**: 100% TypeScript 마이그레이션으로 런타임 오류 감소
+- **성능 개선**: SSR을 통한 초기 로딩 속도 향상 및 SEO 최적화
+- **코드 품질**: 컴포넌트별 관심사 분리로 유지보수성 향상
+- **아키텍처 유연성**: Next.js App Router 구조로 확장성 있는 라우팅 구현

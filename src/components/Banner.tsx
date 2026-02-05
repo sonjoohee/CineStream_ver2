@@ -1,8 +1,9 @@
+'use client';
+
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "../api/axios";
-import requests from "../api/request";
-import "./Banner.css";
+import axios from "../lib/api";
+import requests from "../lib/requests";
 
 interface Movie {
   backdrop_path?: string;
@@ -71,38 +72,107 @@ const Banner = () => {
   if (!movie) return null;
 
   return (
-    <header
-      className="banner"
+    <Header
       style={{
         backgroundImage: `url("https://image.tmdb.org/t/p/original/${movie.backdrop_path}")`,
         backgroundPosition: "top center",
         backgroundSize: "cover",
       }}
     >
-      <div className="banner__contents">
-        <h1 className="banner__title">
+      <BannerContents>
+        <BannerTitle>
           {movie.title || movie.name || movie.original_name}
-        </h1>
+        </BannerTitle>
 
-        <div className="banner__buttons">
+        <BannerButtons>
           {movie.videos?.results[0]?.key && (
-            <button
-              className="banner__button play"
+            <PlayButton
               onClick={() => setIsClicked(true)}
             >
               Play
-            </button>
+            </PlayButton>
           )}
-        </div>
-        <p className="banner__description">{truncate(movie.overview, 100)}</p>
-      </div>
-      <div className="banner__fadeBottom" />
-    </header>
+        </BannerButtons>
+        <BannerDescription>{truncate(movie.overview, 100)}</BannerDescription>
+      </BannerContents>
+      <FadeBottom />
+    </Header>
   );
 };
 
 export default Banner;
 
+const Header = styled.header`
+  position: relative;
+  height: 448px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  color: white;
+  padding-left: 30px;
+  padding-top: 140px;
+  margin-bottom: 20px;
+  background-size: cover;
+  background-position: top center;
+  overflow: hidden;
+`;
+
+const BannerContents = styled.div`
+  max-width: 100%;
+  padding-bottom: 100px;
+`;
+
+const BannerTitle = styled.h1`
+  font-size: 3rem;
+  font-weight: 800;
+  padding-bottom: 0.3rem;
+  margin-bottom: 25px;
+`;
+
+const BannerDescription = styled.p`
+  width: 45rem;
+  line-height: 1.3;
+  padding-right: 3rem;
+  font-size: 0.9rem;
+  max-width: 360px;
+  height: 80px;
+`;
+
+const BannerButtons = styled.div`
+  margin: 20px -2px 0 0;
+`;
+
+const PlayButton = styled.button`
+  cursor: pointer;
+  color: #000;
+  outline: none;
+  border: none;
+  font-weight: 700;
+  border-radius: 0.2vw;
+  padding: 5px 24px;
+  margin-right: 1rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 250ms;
+  
+  &:hover {
+    background-color: #e6e6e6;
+  }
+`;
+
+const FadeBottom = styled.div`
+  height: 7.4rem;
+  background-image: linear-gradient(
+    180deg,
+    transparent,
+    rgba(37, 37, 37, 0.61),
+    #111
+  );
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+`;
 
 const Container = styled.div`
   display: flex;

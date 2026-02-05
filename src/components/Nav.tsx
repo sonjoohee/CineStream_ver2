@@ -1,8 +1,10 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate} from 'react-router-dom';
+import { usePathname, useRouter } from 'next/navigation';
 import app from "../firebase";
-import { getAuth, GoogleAuthProvider,onAuthStateChanged,signInWithPopup, signOut } from 'firebase/auth'; 
+import { getAuth, GoogleAuthProvider,onAuthStateChanged,signInWithPopup, signOut } from 'firebase/auth';
 
 interface UserData {
   photoURL?: string;
@@ -15,42 +17,42 @@ interface NavWrapperProps {
 
 
 const Nav = () => {
-  const initialUserDataString = localStorage.getItem("userData");
-  let initialUserData = {};
-  if (initialUserDataString) {
-    try {
-      initialUserData = JSON.parse(initialUserDataString);
-    } catch (error) {
-      console.error("Error parsing user data from localStorage", error);
+  const [initialUserData, setInitialUserData] = useState({});
+  
+  useEffect(() => {
+    const initialUserDataString = localStorage.getItem("userData");
+    if (initialUserDataString) {
+      try {
+        const parsedData = JSON.parse(initialUserDataString);
+        setInitialUserData(parsedData);
+      } catch (error) {
+        console.error("Error parsing user data from localStorage", error);
+      }
     }
-  }
+  }, []);
 
   const [show, setShow] = useState(false);
-  const { pathname } = useLocation();
+  const pathname = usePathname();
+  const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
-  const navigate = useNavigate();
   
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
-  const [userData, setuserData] = useState<UserData>(initialUserData);
-
+  const [userData, setuserData] = useState<UserData>({});
+  
   
   useEffect(() => {
-
-    
 
     onAuthStateChanged(auth, (user) => {
         if(user){
             if(pathname === "/"){  
-            navigate("/main");
+            router.push("/main");
             }
         }else {
-            navigate("/");
+            router.push("/");
         }
         })
-
-  }, [auth,navigate,pathname])
-
+  }, [auth, router, pathname])
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -59,20 +61,23 @@ const Nav = () => {
       window.removeEventListener("scroll",handleScroll);
     };
   }, []);
- 
+
+  const handleSearch = () => {
+    if (searchValue) {
+      router.push(`/search?q=${searchValue}`);
+    }
+  };
 
   const handleSignOut = () => {
     signOut(auth)
     .then(() => {
         setuserData({});
-        navigate("/");
+        router.push("/");
     })
     .catch((error) => { 
         console.log(error)})
+  };
 
-  }
-  
-  
 
   const handleScroll = () => {
     if (window.scrollY > 50) {
@@ -88,11 +93,6 @@ const Nav = () => {
     setSearchValue(e.target.value);
   }
 
-  const handleSearch = () => {
-    if (searchValue) {
-      navigate(`/search?q=${searchValue}`);
-    }
-  }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -108,6 +108,7 @@ const Nav = () => {
     .then(result => {
         setuserData(result.user as UserData);
         localStorage.setItem("userData", JSON.stringify(result.user));
+        router.push("/main"); // Navigate to main after successful login
     })
     .catch(error => {
         console.log(error);
@@ -120,7 +121,7 @@ const Nav = () => {
         <img
           alt="Disney Plus Logo"
           src="/images/logo.svg"
-          onClick={() => (window.location.href = "/")}
+          onClick={() => router.push("/")} // Changed from window.location.href
         />
       </Logo>
 
@@ -149,91 +150,9 @@ const Nav = () => {
       )}
     </NavWrapper>
   );
-}
+};
 
 export default Nav;
-
-const Login = styled.a`
-    background-color: rgba(0,0,0,0.5);
-    padding: 8px 16px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    border: 1px solid #f9f9f9;
-    transition: all 0.2s ease 0s;
-    cursor: pointer;
-    &:hover{
-        background-color: #f9f9f9;
-        color: #000;
-        border-color: transparent;
-    }   
-    `;
-
-const Input = styled.input`
-    position: fixed;
-    left: 50%;
-    transform: translate(-50%, 0);
-    background-color: rgba(0, 0, 0, 0.582);
-    border-radius: 5px;
-    color: white;
-    padding: 10px 30px 10px 10px;
-    border: none;
-    width: 180px; /* 너비 명시 */
-`;
-
-const SearchIcon = styled.div`
-  position: fixed;
-  left: calc(50% + 70px); /* 입력창 내부 오른쪽에 위치 */
-  transform: translate(-50%, 0);
-  cursor: pointer;
-  img {
-    width: 20px;
-    height: 20px;
-  }
-  top: 24px;
-  z-index: 1; /* 아이콘이 입력창 위에 표시되도록 */
-`;
-
-const DropDown = styled.div`
-position: absolute;
-top: 48px;
-right: 0px;
-background: rgb(19,19,19);
-border: 1px solid rgba(151,151,151,0.34);
-border-radius: 4px;
-box-shadow: rgb(0 0 0 / 50%) 0px 0px 18px 0px;
-padding: 10px;
-font-size: 14px;
-letter-spacing: 3px;
-width: 100px;
-opacity:0;
-`;
-
-const SignOut = styled.div`
-position: relative;
-height: 48px;
-width:48px;
-display:flex;
-cursor:pointer;
-align-items: center;
-justify-content: center;
-
-&:hover{
-    ${DropDown}{
-        opacity:1;
-        transition-duration: 1s;
-    }
-}
-`;
-
-const UserImg = styled.img`
-border-radius: 50%;
-width:100%;
-height: 100%;
-`;
-
-
-
-
 
 const NavWrapper = styled.nav<NavWrapperProps>`
   position: fixed;
@@ -263,3 +182,84 @@ const Logo = styled.a`
     width: 100%;
   }
 `;
+
+const Login = styled.a`
+    background-color: rgba(0,0,0,0.5);
+    padding: 8px 16px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: 1px solid #f9f9f9;
+    transition: all 0.2s ease 0s;
+    cursor: pointer;
+    &:hover{
+        background-color: #f9f9f9;
+        color: #000;
+        border-color: transparent;
+    }   
+    `;
+
+const DropDown = styled.div`
+position: absolute;
+top: 48px;
+right: 0px;
+background: rgb(19,19,19);
+border: 1px solid rgba(151,151,151,0.34);
+border-radius: 4px;
+box-shadow: rgb(0 0 0 / 50%) 0px 0px 18px 0px;
+padding: 10px;
+font-size: 14px;
+letter-spacing: 3px;
+width: 100px;
+opacity:0;
+`;
+
+
+const Input = styled.input`
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: rgba(0, 0, 0, 0.582);
+    border-radius: 5px;
+    color: white;
+    padding: 10px 30px 10px 10px;
+    border: none;
+    width: 180px; /* 너비 명시 */
+`;
+
+const SearchIcon = styled.div`
+  position: fixed;
+  left: calc(50% + 70px); /* 입력창 내부 오른쪽에 위치 */
+  transform: translate(-50%, 0);
+  cursor: pointer;
+  img {
+    width: 20px;
+    height: 20px;
+  }
+  top: 24px;
+  z-index: 1; /* 아이콘이 입력창 위에 표시되도록 */
+`;
+
+const SignOut = styled.div`
+position: relative;
+height: 48px;
+width:48px;
+display:flex;
+cursor:pointer;
+align-items: center;
+justify-content: center;
+
+&:hover{
+    ${DropDown}{
+        opacity:1;
+        transition-duration: 1s;
+    }
+}
+`;
+
+const UserImg = styled.img`
+border-radius: 50%;
+width:100%;
+height: 100%;
+`;
+
+
