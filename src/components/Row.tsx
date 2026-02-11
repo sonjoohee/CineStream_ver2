@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import api from "../lib/api";
+import axios from "../api/axios";
 import MovieModal from "./movie-modal";
 
 interface Movie {
@@ -28,7 +28,7 @@ const Row = ({ title, id, fetchUrl }: RowProps) => {
   const [movieSelected, setMovieSelection] = useState<Movie>({} as Movie);
 
   const fetchMovieData = useCallback(async () => {
-    const response = await api.get(fetchUrl);
+    const response = await axios.get(fetchUrl);
     setMovies(response.data.results);
   }, [fetchUrl]);
 
@@ -57,14 +57,19 @@ const Row = ({ title, id, fetchUrl }: RowProps) => {
 
   return (
     <Container>
-      <Title>{title}</Title>
-      <SliderWrapper className="slider">
-        <ArrowButton className="slider__arrow-left" onClick={handleScrollLeft}>
-          <Arrow>{"<"}</Arrow>
-        </ArrowButton>
-        <PosterContainer id={id} className="row__posters">
+      <h2>{title}</h2>
+      <div className="slider">
+        <div className="slider__arrow-left">
+          <span
+            className="arrow"
+            onClick={handleScrollLeft}
+          >
+            {"<"}
+          </span>
+        </div>
+        <div id={id} className="row__posters">
           {movies.map((movie) => (
-            <PosterImage
+            <img
               key={movie.id}
               className="row__poster"
               src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
@@ -72,11 +77,16 @@ const Row = ({ title, id, fetchUrl }: RowProps) => {
               onClick={() => handleClick(movie)}
             />
           ))}
-        </PosterContainer>
-        <ArrowButton className="slider__arrow-right" onClick={handleScrollRight}>
-          <Arrow>{">"}</Arrow>
-        </ArrowButton>
-      </SliderWrapper>
+        </div>
+        <div className="slider__arrow-right">
+          <span
+            className="arrow"
+            onClick={handleScrollRight}
+          >
+            {">"}
+          </span>
+        </div>
+      </div>
 
       {modalOpen &&  
       <MovieModal
@@ -90,78 +100,106 @@ const Row = ({ title, id, fetchUrl }: RowProps) => {
 
 export default Row;
 
-const Container = styled.section`
-  margin: 0 0 2.5rem;
-  padding: 0 1.25rem;
-`;
-
-const Title = styled.h2`
-  margin-bottom: 0.625rem;
-`;
-
-const SliderWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
-
-const ArrowButton = styled.button`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  padding: 0;
-  
-  &.slider__arrow-left {
-    left: 10px;
+const Container = styled.div`
+  .slider {
+    position: relative;
+  }
+  .slider__arrow-left {
+    background-clip: content-box;
+    padding: 20px 0;
+    box-sizing: border-box;
+    transition: 400ms all ease-in-out;
+    cursor: pointer;
+    width: 80px;
+    z-index: 1000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    visibility: hidden;
   }
   
-  &.slider__arrow-right {
-    right: 10px;
+  .slider__arrow-right {
+    background-clip: content-box;
+    padding: 20px 0;
+    box-sizing: border-box;
+    transition: 400ms all ease-in-out;
+    cursor: pointer;
+    width: 80px;
+    z-index: 1000;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden; 
   }
-`;
-
-const Arrow = styled.span`
-  font-size: 24px;
-  color: white;
-  user-select: none;
-`;
-
-const PosterContainer = styled.div`
-  display: flex;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
-  padding: 20px;
   
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera*/
+  .arrow {
+    transition: 400ms all ease-in-out;
   }
-`;
-
-const PosterImage = styled.img`
-  object-fit: contain;
-  width: 100%;
-  max-width: 200px;
-  transition: transform 450ms;
-  border-radius: 10px;
-  margin-right: 10px;
-  cursor: pointer;
-  flex-shrink: 0;
+  .arrow:hover {
+    transition: 400ms all ease-in-out;
+    transform: scale(1.5);
+  }
   
-  &:hover {
+  .slider:hover .slider__arrow-left {
+    transition: 400ms all ease-in-out;
+    visibility: visible;
+  }
+  
+  .slider:hover .slider__arrow-right {
+    transition: 400ms all ease-in-out;
+    visibility: visible;
+  }
+  
+  .slider__arrow-left:hover {
+    background: rgba(20, 20, 20, 0.5);
+    transition: 400ms all ease-in-out;
+  }
+  .slider__arrow-right:hover {
+    background: rgba(20, 20, 20, 0.5);
+    transition: 400ms all ease-in-out;
+  }
+  
+  .row__posters {
+    display: flex;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    padding: 20px 0 20px 20px;
+    scroll-behavior: smooth;
+  }
+  
+  .row__posters::-webkit-scrollbar {
+    display: none;
+  }
+  .row__poster {
+    object-fit: contain;
+    width: 100%;
+    max-height: 144px;
+    margin-right: 10px;
+    transform: transform 450ms;
+    border-radius: 4px;
+  }
+  
+  .row__poster:hover {
     transform: scale(1.08);
-    opacity: 1;
+  }
+  
+  @media screen and (min-width: 1200px) {
+    .row__poster {
+      max-height: 160px;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .row__poster {
+      max-height: 280px;
+    }
   }
 `;
